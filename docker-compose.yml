@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  mailserver:
+    image: analogic/poste.io:latest
+    container_name: mailserver
+    hostname: ${MAIL_HOSTNAME}
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TIMEZONE}
+      - HOSTNAME=${MAIL_HOSTNAME}
+      # HTTPS=OFF indica que o próprio container não vai cuidar de TLS,
+      # quem faz isso é o Traefik do Dokploy.
+      - HTTPS=OFF
+
+    volumes:
+      - ./data:/data
+      - /etc/localtime:/etc/localtime:ro
+
+    # NÃO expomos 80/443 pra não brigar com o Traefik do Dokploy.
+    # Só as portas “não HTTP” (SMTP/IMAP/POP/Sieve).
+    ports:
+      - "25:25"     # SMTP
+      - "465:465"   # SMTPS (opcional, mas bom ter)
+      - "587:587"   # Submission
+      - "110:110"   # POP3
+      - "995:995"   # POP3S
+      - "143:143"   # IMAP
+      - "993:993"   # IMAPS
+      - "4190:4190" # Sieve (opcional)
