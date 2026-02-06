@@ -8,7 +8,10 @@ services:
       - TZ=America/Sao_Paulo
       - HOSTNAME=mail.pineapplelab.net
       - HTTPS=OFF
+      - EXTERNAL_IP=31.97.240.207
+
     ports:
+      - "80:80"
       - "25:25"
       - "587:587"
       - "993:993"
