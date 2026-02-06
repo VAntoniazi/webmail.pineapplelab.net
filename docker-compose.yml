@@ -9,6 +9,7 @@ services:
       - HOSTNAME=mail.pineapplelab.net
       - HTTPS=OFF
     ports:
+      - "80:80"
       - "25:25"
       - "587:587"
       - "993:993"
