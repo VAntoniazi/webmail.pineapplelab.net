@@ -1,21 +1,7 @@
-#!/usr/bin/env bash
-set -e
+VOL="poste_data"
+DEST="/srv/backups/mail"
+TS="$(date +%F_%H-%M-%S)"
+mkdir -p "$DEST"
 
-BACKUP_DIR="./backup"
-DATA_DIR="./data"
-
-mkdir -p "$BACKUP_DIR"
-
-TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
-ARCHIVE="$BACKUP_DIR/mailserver-$TIMESTAMP.tar.gz"
-
-echo ">> Parando container mailserver..."
-docker compose stop mailserver
-
-echo ">> Compactando pasta de dados..."
-tar -czf "$ARCHIVE" "$DATA_DIR"
-
-echo ">> Iniciando container mailserver..."
-docker compose start mailserver
-
-echo "Backup criado em: $ARCHIVE"
+docker run --rm -v ${VOL}:/v:ro -v ${DEST}:/b alpine \
+  sh -lc "cd /v && tar -czf /b/${VOL}_${TS}.tar.gz ."
