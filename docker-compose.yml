@@ -9,14 +9,13 @@ services:
       - HOSTNAME=mail.pineapplelab.net
       - HTTPS=OFF
       - EXTERNAL_IP=31.97.240.207
-
-ports:
-  - "8081:80"
-  - "25:25"
-  - "587:587"
-  - "993:993"
-  - "465:465"
-  - "4190:4190"
+    ports:
+      - "8081:80"
+      - "25:25"
+      - "587:587"
+      - "993:993"
+      - "465:465"
+      - "4190:4190"
     volumes:
       - poste_data:/data
       - /etc/localtime:/etc/localtime:ro
