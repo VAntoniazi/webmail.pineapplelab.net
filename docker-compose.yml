@@ -17,7 +17,7 @@ services:
       # IMAPS (leitura segura de emails)
       - "993:993"
       # HTTP (interface web - IMPORTANTE para evitar Bad Gateway)
-      - "80:80"
+      - "8080:80"
       # HTTPS (interface web segura - será configurado depois)
       - "443:443"
       # ManageSieve (filtros de email)
