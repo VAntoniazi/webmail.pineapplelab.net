@@ -1,24 +1,27 @@
+# docker-compose.yml
 services:
-  mailserver:
-    image: analogic/poste.io:latest
-    container_name: mailserver
-    hostname: mail.pineapplelab.net
+  stalwart:
+    image: stalwartlabs/stalwart:latest
     restart: unless-stopped
-    environment:
-      - TZ=America/Sao_Paulo
-      - HOSTNAME=mail.pineapplelab.net
-      - HTTPS=OFF
-      - EXTERNAL_IP=31.97.240.207
+    container_name: stalwart-mailserver
     ports:
-      - "8081:80"
-      - "25:25"
-      - "587:587"
-      - "993:993"
-      - "465:465"
-      - "4190:4190"
+      - "25:25"       # SMTP (para receber e-mails da internet)
+      - "587:587"     # SMTP Submission (para clientes de e-mail enviarem mensagens)
+      - "465:465"     # SMTPS (envio seguro para clientes legados)
+      - "993:993"     # IMAPS (para clientes de e-mail baixarem mensagens com segurança)
+      - "143:143"     # IMAP (para clientes que usam STARTTLS)
+      - "4190:4190"   # ManageSieve (para gerenciar regras de filtro de e-mail)
     volumes:
-      - poste_data:/data
-      - /etc/localtime:/etc/localtime:ro
+      - stalwart_data:/opt/stalwart
+    environment:
+      - SESSION__RCPT__CATCH_ALL=true # Opcional: captura e-mails enviados para qualquer endereço no seu domínio
+    networks:
+      - dokploy-network
 
 volumes:
-  poste_data:
+  stalwart_data:
+
+# A rede 'dokploy-network' é criada automaticamente pelo Dokploy. Use o nome exato.
+networks:
+  dokploy-network:
+    external: true
