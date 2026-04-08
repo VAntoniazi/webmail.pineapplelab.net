@@ -1,9 +1,6 @@
-version: '2.4'
-
 services:
   mailcow:
-    image: mailcow/mailcow:latest
-    restart: always
+    image: mailcow/mailcow-dockerized:latest
     container_name: mailcow
     ports:
       - "25:25"
@@ -11,32 +8,18 @@ services:
       - "465:465"
       - "993:993"
       - "995:995"
-      - "143:143"
-      - "110:110"
-      - "4190:4190"
       - "8082:80"
     volumes:
-      - mailcow_data:/var/lib/mailcow
-      - mailcow_crypto:/var/lib/mailcow/crypto
-      - mailcow_ssl:/var/lib/mailcow/ssl
+      - mailcow_data:/data
     environment:
-      - DBNAME=mailcow
-      - DBUSER=mailcow
-      - DBPASS=mailcowStrongPassword123
-      - REDIS_PASS=redisStrongPassword123
       - MAILCOW_HOSTNAME=mail.pineapplelab.net
-      - SKIP_LETS_ENCRYPT=n
       - TZ=America/Sao_Paulo
+    restart: always
     networks:
       - dokploy-network
 
 volumes:
   mailcow_data:
-    driver: local
-  mailcow_crypto:
-    driver: local
-  mailcow_ssl:
-    driver: local
 
 networks:
   dokploy-network:
