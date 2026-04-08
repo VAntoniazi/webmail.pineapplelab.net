@@ -4,21 +4,25 @@ services:
     restart: unless-stopped
     container_name: stalwart-mail
     ports:
-      # SMTP (envio/recebimento)
-      - "25:25"
-      # SMTP Submission (envio autenticado)
-      - "587:587"
-      # SMTPS (envio seguro)
-      - "465:465"
-      # IMAP (leitura)
-      - "143:143"
-      # IMAPS (leitura segura)
-      - "993:993"
-      # HTTP Webmail - usando porta 8080 para não conflitar
-      - "8080:80"
-      # HTTPS - será gerenciado pelo Dokploy/Traefik
+      # SMTP (envio/recebimento de emails)
+      - "2525:25"
+      # SMTP Submission (envio autenticado para clientes)
+      - "2587:587"
+      # SMTPS (envio seguro para clientes legados)
+      - "2465:465"
+      # IMAP (leitura de emails - não seguro)
+      - "2143:143"
+      # IMAPS (leitura segura de emails)
+      - "2993:993"
+      # POP3 (download de emails)
+      - "2110:110"
+      # POP3S (download seguro)
+      - "2995:995"
+      # HTTP Webmail + Admin (TUDO na mesma porta 8082)
+      - "8082:80"
+      # HTTPS Webmail + Admin (TUDO na mesma porta 8443)
       - "8443:443"
-      # ManageSieve
+      # ManageSieve (filtros de email)
       - "4190:4190"
     volumes:
       - stalwart_data:/opt/stalwart
@@ -28,6 +32,7 @@ services:
       - STALWART_HTTP_BIND=0.0.0.0:80
       - STALWART_HTTPS_BIND=0.0.0.0:443
       - STALWART_HOSTNAME=mail.pineapplelab.net
+      - STALWART_ADMIN_PORT=8082
     networks:
       - dokploy-network
     healthcheck:
@@ -35,7 +40,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
 volumes:
   stalwart_data:
