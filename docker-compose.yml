@@ -1,27 +1,52 @@
-# docker-compose.yml
+version: '3.8'
+
 services:
   stalwart:
     image: stalwartlabs/stalwart:latest
     restart: unless-stopped
-    container_name: stalwart-mailserver
+    container_name: stalwart-mail
     ports:
-      - "25:25"       # SMTP (para receber e-mails da internet)
-      - "587:587"     # SMTP Submission (para clientes de e-mail enviarem mensagens)
-      - "465:465"     # SMTPS (envio seguro para clientes legados)
-      - "993:993"     # IMAPS (para clientes de e-mail baixarem mensagens com segurança)
-      - "143:143"     # IMAP (para clientes que usam STARTTLS)
-      - "4190:4190"   # ManageSieve (para gerenciar regras de filtro de e-mail)
+      # SMTP (envio/recebimento)
+      - "25:25"
+      # SMTP Submission (envio autenticado para clientes)
+      - "587:587"
+      # SMTPS (envio seguro para clientes legados)
+      - "465:465"
+      # IMAP (leitura de emails - não seguro)
+      - "143:143"
+      # IMAPS (leitura segura de emails)
+      - "993:993"
+      # HTTP (interface web - IMPORTANTE para evitar Bad Gateway)
+      - "80:80"
+      # HTTPS (interface web segura - será configurado depois)
+      - "443:443"
+      # ManageSieve (filtros de email)
+      - "4190:4190"
     volumes:
       - stalwart_data:/opt/stalwart
+      - stalwart_logs:/opt/stalwart/logs
     environment:
-      - SESSION__RCPT__CATCH_ALL=true # Opcional: captura e-mails enviados para qualquer endereço no seu domínio
+      - TZ=America/Sao_Paulo
+      # Configuração para HTTP funcionar corretamente
+      - STALWART_HTTP_BIND=0.0.0.0:80
+      - STALWART_HTTPS_BIND=0.0.0.0:443
+      # Configuração de hostname
+      - STALWART_HOSTNAME=mail.pineapplelab.net
     networks:
       - dokploy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   stalwart_data:
+    driver: local
+  stalwart_logs:
+    driver: local
 
-# A rede 'dokploy-network' é criada automaticamente pelo Dokploy. Use o nome exato.
 networks:
   dokploy-network:
     external: true
