@@ -1,25 +1,38 @@
 services:
-  mailcow:
-    image: mailcow/mailcow-dockerized:latest
-    container_name: mailcow
+  poste:
+    image: analogic/poste.io:latest
+    container_name: poste
+    restart: always
     ports:
       - "25:25"
       - "587:587"
       - "465:465"
       - "993:993"
       - "995:995"
+      - "143:143"
+      - "110:110"
+      - "4190:4190"
       - "8082:80"
     volumes:
-      - mailcow_data:/data
+      - poste_data:/data
     environment:
-      - MAILCOW_HOSTNAME=mail.pineapplelab.net
       - TZ=America/Sao_Paulo
-    restart: always
+      - HTTPS=OFF
+      - DISABLE_CLAMAV=FALSE
+      - DISABLE_RSPAMD=FALSE
+      - ENABLE_FAIL2BAN=TRUE
     networks:
       - dokploy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 volumes:
-  mailcow_data:
+  poste_data:
+    driver: local
 
 networks:
   dokploy-network:
