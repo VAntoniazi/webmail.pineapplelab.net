@@ -1,101 +1,43 @@
-version: '3.8'
+version: '2.4'
 
 services:
-  # Banco de dados para o Roundcube
-  mysql:
-    image: mariadb:10.11
+  mailcow:
+    image: mailcow/mailcow:latest
     restart: always
-    container_name: mail-mysql
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
-      MYSQL_DATABASE: roundcube
-      MYSQL_USER: roundcube
-      MYSQL_PASSWORD: roundcubepass123
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - mail-network
-
-  # Servidor SMTP (Postfix)
-  postfix:
-    image: boky/postfix
-    restart: always
-    container_name: mail-postfix
-    environment:
-      - ALLOWED_SENDER_DOMAINS=pineapplelab.net
-      - RELAYHOST=
-      - SMTPD_SASL_PATH=smtpd
-    volumes:
-      - mail_data:/var/mail
-      - postfix_data:/etc/postfix
+    container_name: mailcow
     ports:
       - "25:25"
       - "587:587"
       - "465:465"
-    networks:
-      - mail-network
-
-  # Servidor IMAP/POP3 (Dovecot)
-  dovecot:
-    image: dovecot/dovecot
-    restart: always
-    container_name: mail-dovecot
-    environment:
-      - MAILNAME=mail.pineapplelab.net
-    volumes:
-      - mail_data:/var/mail
-      - dovecot_data:/etc/dovecot
-    ports:
-      - "143:143"
       - "993:993"
-      - "110:110"
       - "995:995"
-    networks:
-      - mail-network
-
-  # Webmail (Roundcube)
-  roundcube:
-    image: roundcube/roundcubemail:latest
-    restart: always
-    container_name: mail-roundcube
-    environment:
-      - ROUNDCUBE_DB_TYPE=mysql
-      - ROUNDCUBE_DB_HOST=mysql
-      - ROUNDCUBE_DB_NAME=roundcube
-      - ROUNDCUBE_DB_USER=roundcube
-      - ROUNDCUBE_DB_PASSWORD=roundcubepass123
-      - ROUNDCUBE_DEFAULT_HOST=mail.pineapplelab.net
-      - ROUNDCUBE_SMTP_SERVER=mail.pineapplelab.net
-      - ROUNDCUBE_SMTP_PORT=587
-      - ROUNDCUBE_SMTP_AUTH_TYPE=LOGIN
+      - "143:143"
+      - "110:110"
+      - "4190:4190"
+      - "8082:80"
     volumes:
-      - roundcube_data:/var/www/html
-    ports:
-      - "8080:80"
-    depends_on:
-      - mysql
+      - mailcow_data:/var/lib/mailcow
+      - mailcow_crypto:/var/lib/mailcow/crypto
+      - mailcow_ssl:/var/lib/mailcow/ssl
+    environment:
+      - DBNAME=mailcow
+      - DBUSER=mailcow
+      - DBPASS=mailcowStrongPassword123
+      - REDIS_PASS=redisStrongPassword123
+      - MAILCOW_HOSTNAME=mail.pineapplelab.net
+      - SKIP_LETS_ENCRYPT=n
+      - TZ=America/Sao_Paulo
     networks:
-      - mail-network
-
-  # Adminer (gerenciar banco de dados - opcional)
-  adminer:
-    image: adminer:latest
-    restart: always
-    container_name: mail-adminer
-    ports:
-      - "8081:8080"
-    depends_on:
-      - mysql
-    networks:
-      - mail-network
+      - dokploy-network
 
 volumes:
-  mysql_data:
-  mail_data:
-  postfix_data:
-  dovecot_data:
-  roundcube_data:
+  mailcow_data:
+    driver: local
+  mailcow_crypto:
+    driver: local
+  mailcow_ssl:
+    driver: local
 
 networks:
-  mail-network:
-    driver: bridge
+  dokploy-network:
+    external: true
