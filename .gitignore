@@ -1,5 +1,0 @@
-# Dados persistentes do mailserver (NÃO versionar)
-data/
-data/*
-*.log
-*.tmp
