@@ -3,6 +3,7 @@ services:
     image: analogic/poste.io:latest
     container_name: poste
     restart: always
+
     ports:
       - "25:25"
       - "587:587"
@@ -13,18 +14,28 @@ services:
       - "110:110"
       - "4190:4190"
       - "8082:80"
+
     volumes:
       - poste_data:/data
+
     environment:
       - TZ=America/Sao_Paulo
       - HTTPS=OFF
       - DISABLE_CLAMAV=FALSE
       - DISABLE_RSPAMD=FALSE
       - ENABLE_FAIL2BAN=TRUE
+
+      # IMPORTANTE PARA NÃO QUEBRAR WEBMAIL EM PROXY
+      - VIRTUAL_HOST=mail.pineapplelab.net
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=mail.pineapplelab.net
+      - LETSENCRYPT_EMAIL=admin@pineapplelab.net
+
     networks:
       - dokploy-network
+
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/webmail/"]
       interval: 30s
       timeout: 10s
       retries: 3
