@@ -17,8 +17,7 @@ services:
       - poste_data:/data
     environment:
       - TZ=America/Sao_Paulo
-      - HTTPS=ON
-      - HOSTNAME=mail.pineapplelab.net
+      - HTTPS=OFF
       - DISABLE_CLAMAV=FALSE
       - DISABLE_RSPAMD=FALSE
       - ENABLE_FAIL2BAN=TRUE
