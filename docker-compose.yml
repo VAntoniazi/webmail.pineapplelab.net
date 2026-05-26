@@ -7,23 +7,14 @@ services:
     hostname: mail.pineapplelab.net
 
     ports:
-      # SMTP recebimento
       - "25:25"
-
-      # SMTP envio autenticado
       - "587:587"
       - "465:465"
-
-      # IMAP/POP
       - "993:993"
       - "995:995"
       - "143:143"
       - "110:110"
-
-      # Sieve
       - "4190:4190"
-
-      # Webmail/admin via porta alternativa
       - "8082:80"
 
     volumes:
@@ -31,18 +22,9 @@ services:
 
     environment:
       - TZ=America/Sao_Paulo
-
-      # HTTPS fica fora do container, via Dokploy/Traefik
       - HTTPS=OFF
-      - HTTP_PORT=8082
-
-      # Recomendo deixar ClamAV off em VPS pequeno
       - DISABLE_CLAMAV=TRUE
-
-      # Para testar recebimento do Meta, pode deixar TRUE temporariamente.
-      # Depois, volte para FALSE.
       - DISABLE_RSPAMD=TRUE
-
       - ENABLE_FAIL2BAN=TRUE
 
     networks:
